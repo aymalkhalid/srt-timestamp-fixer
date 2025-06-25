@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.env
+.venv
+env/
+venv/
+input_backup.txt
+output.srt
+*.bak
+*.swp
+.DS_Store
