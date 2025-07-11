@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h1 class="card-title mb-0">
+                    <i class="fas fa-wrench"></i> SRT Timestamp Fixer
+                </h1>
+                <small>Fix malformed timestamps in SRT subtitle files</small>
+            </div>
+            <div class="card-body">
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                <form action="/upload" method="post" enctype="multipart/form-data" id="uploadForm">
+                    <div class="drag-area mb-3" id="dragArea">
+                        <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                        <h5>Drag & Drop your SRT file here</h5>
+                        <p class="text-muted">or click to browse</p>
+                        <input type="file" name="file" accept=".srt,.txt" required class="d-none" id="fileInput">
+                        <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('fileInput').click()">
+                            <i class="fas fa-folder-open"></i> Browse Files
+                        </button>
+                    </div>
+                    
+                    <div class="file-info d-none mb-3" id="fileInfo">
+                        <div class="alert alert-info">
+                            <i class="fas fa-file"></i> Selected: <span id="fileName"></span>
+                            <small class="d-block text-muted">Size: <span id="fileSize"></span></small>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                        <button type="button" class="btn btn-outline-secondary" id="previewBtn" disabled>
+                            <i class="fas fa-eye"></i> Preview Changes
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="submitBtn" disabled>
+                            <i class="fas fa-magic"></i> Fix Timestamps
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="preview-results mt-4 d-none" id="previewResults">
+                    <h5><i class="fas fa-search"></i> Preview Results</h5>
+                    <div id="previewContent"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-question-circle"></i> What does this fix?</h5>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-success"></i> Missing hours: <code>01:30,500</code> → <code>00:01:30,500</code></li>
+                            <li><i class="fas fa-check text-success"></i> Missing arrows: <code>01:30,500  01:31,500</code> → <code>00:01:30,500 --> 00:01:31,500</code></li>
+                            <li><i class="fas fa-check text-success"></i> Inconsistent formatting</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-shield-alt"></i> Safe & Secure</h5>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-success"></i> Files processed locally</li>
+                            <li><i class="fas fa-check text-success"></i> No data stored on server</li>
+                            <li><i class="fas fa-check text-success"></i> Temporary files auto-deleted</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dragArea = document.getElementById('dragArea');
+    const fileInput = document.getElementById('fileInput');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const submitBtn = document.getElementById('submitBtn');
+    const previewBtn = document.getElementById('previewBtn');
+    const previewResults = document.getElementById('previewResults');
+    const previewContent = document.getElementById('previewContent');
+    
+    // Drag and drop handlers
+    dragArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dragArea.classList.add('dragover');
+    });
+    
+    dragArea.addEventListener('dragleave', () => {
+        dragArea.classList.remove('dragover');
+    });
+    
+    dragArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dragArea.classList.remove('dragover');
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            fileInput.files = files;
+            handleFileSelect();
+        }
+    });
+    
+    fileInput.addEventListener('change', handleFileSelect);
+    
+    function handleFileSelect() {
+        const file = fileInput.files[0];
+        if (file) {
+            fileName.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+            fileInfo.classList.remove('d-none');
+            submitBtn.disabled = false;
+            previewBtn.disabled = false;
+        }
+    }
+    
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+    
+    // Preview functionality
+    previewBtn.addEventListener('click', function() {
+        const file = fileInput.files[0];
+        if (!file) return;
+        
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        previewBtn.disabled = true;
+        previewBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+        
+        fetch('/preview', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            
+            previewContent.innerHTML = generatePreviewHTML(data);
+            previewResults.classList.remove('d-none');
+        })
+        .catch(error => {
+            alert('Error: ' + error.message);
+        })
+        .finally(() => {
+            previewBtn.disabled = false;
+            previewBtn.innerHTML = '<i class="fas fa-eye"></i> Preview Changes';
+        });
+    });
+    
+    function generatePreviewHTML(data) {
+        if (data.issues_count === 0) {
+            return '<div class="alert alert-success"><i class="fas fa-check-circle"></i> No issues found! Your file is already properly formatted.</div>';
+        }
+        
+        let html = `<div class="alert alert-info"><i class="fas fa-info-circle"></i> Found ${data.issues_count} timestamp issues that will be fixed:</div>`;
+        html += '<div class="table-responsive"><table class="table table-sm"><thead><tr><th>Line</th><th>Original</th><th>Fixed</th><th>Issues</th></tr></thead><tbody>';
+        
+        data.issues.forEach(issue => {
+            html += `<tr>
+                <td>${issue.line_number}</td>
+                <td><code>${issue.original}</code></td>
+                <td><code class="text-success">${issue.fixed}</code></td>
+                <td><small class="text-muted">${issue.issues.join(', ')}</small></td>
+            </tr>`;
+        });
+        
+        html += '</tbody></table></div>';
+        
+        if (data.issues_count > 20) {
+            html += `<p><small class="text-muted">... and ${data.issues_count - 20} more issues</small></p>`;
+        }
+        
+        return html;
+    }
+});
+</script>
+{% endblock %}

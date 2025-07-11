@@ -40,6 +40,8 @@ ENV/
 Thumbs.db
 
 # Project specific
-srt_script/input_backup.txt
-srt_script/output.srt
 *.backup
+*.srt.backup
+temp_files/
+uploads/
+processed/
