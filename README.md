@@ -2,8 +2,6 @@
 
 A lightweight, standalone toolkit for fixing malformed SRT subtitle timestamps. Available as Command Line Interface (CLI), Desktop GUI, Web Application, and Windows Executables (.exe).
 
-![SRT Fixer Demo](docs/readme_image.png)
-
 ---
 
 ## 🚀 Overview
@@ -17,6 +15,8 @@ SRT Timestamp Fixer standardizes SRT subtitle files by fixing malformed timestam
 - Safe processing (backups, UTF-8)
 - Cross-platform (Python 3.6+)
 
+---
+
 ## ⚡ Quick Start
 
 ### 1. Command Line
@@ -24,14 +24,30 @@ SRT Timestamp Fixer standardizes SRT subtitle files by fixing malformed timestam
 python src/convert_to_srt.py -i input.srt -o output.srt
 ```
 
+---
+
 ### 2. Desktop GUI
-- **Windows:** Double-click `SRT_Timestamp_Fixer_GUI.exe` or `src/launch_gui.bat`
-- **Linux/macOS:** Run `src/launch_gui.sh`
+**Windows:** Double-click `SRT_Timestamp_Fixer_GUI.exe` or `src/launch_gui.bat`  
+**Linux/macOS:** Run `src/launch_gui.sh`
+
+<div align="center">
+  <img src="docs/readme_image.png" alt="SRT Fixer Desktop GUI" width="600">
+  <br>
+  <strong>Desktop GUI:</strong> Easily fix SRT files with a user-friendly interface. Select files, preview changes, and process with a click.
+</div>
+
+---
 
 ### 3. Web Application
-- **Windows:** Double-click `SRT_Timestamp_Fixer_Web.exe` or `src/launch_web.bat`
-- **Linux/macOS:** Run `src/launch_web.sh`
-- Open browser at `http://localhost:5000`
+**Windows:** Double-click `SRT_Timestamp_Fixer_Web.exe` or `src/launch_web.bat`  
+**Linux/macOS:** Run `src/launch_web.sh`  
+Open browser at `http://localhost:5000`
+
+<div align="center">
+  <img src="docs/readme_local_host_web.png" alt="SRT Fixer Web App" width="600">
+  <br>
+  <strong>Web App:</strong> Fix SRT files directly in your browser. Upload, preview, and download results. Works on any OS.
+</div>
 
 For more details and troubleshooting, see [USER_GUIDE.md](USER_GUIDE.md).
 
