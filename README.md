@@ -4,8 +4,20 @@ A lightweight, standalone toolkit for fixing malformed SRT subtitle timestamps. 
 
 ---
 
-## 🚀 Overview
-SRT Timestamp Fixer standardizes SRT subtitle files by fixing malformed timestamps, missing arrows, and formatting issues. Designed for content creators, video editors, and anyone working with AI-generated or automated subtitles.
+## 🚀 Why This Tool?
+
+Modern workflows often generate subtitles using Large Language Models (LLMs) and other automated systems. However, these outputs frequently contain inconsistent or malformed SRT timestamps—missing hours, missing arrows, or non-standard formats. 
+
+**While creating YouTube videos, I personally faced repeated issues with broken subtitle timestamps.** Frustrated by the lack of reliable, user-friendly solutions—and driven by personal necessity—I built SRT Timestamp Fixer as a dedicated, professional tool:
+
+- **Reliability:** Ensures every SRT file is standardized and compliant, regardless of source.
+- **Convenience:** Provides multiple interfaces (CLI, GUI, Web, Executable) for all user types.
+- **Efficiency:** Saves time for content creators, editors, and developers by automating tedious fixes.
+- **Portability:** Works cross-platform and can be used standalone, without Python if desired.
+
+This tool is designed to streamline subtitle workflows and eliminate manual corrections, making it ideal for anyone working with AI-generated or automated subtitles.
+
+---
 
 ## ✨ Features
 - Fix missing hours in timestamps
